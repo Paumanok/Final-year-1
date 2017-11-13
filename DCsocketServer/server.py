@@ -3,12 +3,14 @@
 
 from http.server import BaseHTTPRequestHandler
 from  io import StringIO
+from datetime import datetime
 import socket
 import threading
 
 
 class server:
     default_version = "HTTP/0.9"
+    content_type_text = "text/html; charset=iso-8859-1"
 
     #initialize server socket
     def __init__(self, host, port):
@@ -19,8 +21,9 @@ class server:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
 
-        self.handlers = { "GET": lambda:self.HTTP_GET(request),
-                          "404": lambda:self.HTTP_404(request),
+        self.handlers = { "GET": lambda:self.HTTP_GET(request)}
+
+        self.codes = {    "404": lambda:self.HTTP_404(request),
                           "403": lambda:self.HTTP_403(request),
                           "501": lambda:self.HTTP_501(request)
                           }
@@ -63,14 +66,34 @@ class server:
         command = request.command
 
         if not command in self.handlers.keys():
-            return self.handlers["501"](request)
+            return self.codes["501"](request)
         else:
             return self.handlers[command](request)
 
 
     def HTTP_GET(self, request):
 
-        self.socket
+        return 0
+
+    def construct_header(self,response_status, content_type, content_length):
+        time = datetime.now().strftime('%b %d  %I:%M:%S\n')
+        http_response = ("HTTP/1.1" + response_status + "\r\n" + \
+                         "Date: " + time + "\r\n" + \
+                         "Server: python-custom\r\n" +\
+                         "Content-Length: " + str(content_length) + "\r\n" + \
+                         "Connection: Closed\r\n" + \
+                         "Content-Type: " + content_type + "\r\n" )
+        return http_response
+
+
+    def HTTP_501(self, request):
+        construct_header("500 not implemented", content_type_text, 0)
+        return 0
+
+    def HTTP_404(self, request):
+        return 0
+
+    def HTTP_401(self, request):
         return 0
 
 #executive decision: project not about text parsing, so offload parsing
