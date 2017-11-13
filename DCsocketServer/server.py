@@ -45,11 +45,11 @@ class server:
                 if data:
                     print(data)
                     # Reply as HTTP/1.1 server, saying "HTTP OK" (code 200).
-                    response_proto = 'HTTP/1.1'
-                    response_status = '200'
-                    response_status_text = 'OK' # this can be random
-                    client.send('%s %s %s' % (response_proto, response_status, \
-                                                        response_status_text))
+                    #response_proto = 'HTTP/1.1'
+                    #response_status = '200'
+                    #response_status_text = 'OK' # this can be random
+                    #client.send('%s %s %s' % (response_proto, response_status, \
+                    #                                    response_status_text))
                     #handle_HTTP(data)
                 else:
                     raise error('client disconnected')
