@@ -12,7 +12,7 @@ import os
 class server:
     default_version = "HTTP/0.9"
     content_type_text = "text/html"
-    enable_threading = False
+    enable_threading = True
     running_path = os.path.dirname(os.path.abspath(__file__))
 
     #initialize server socket
@@ -67,7 +67,6 @@ class server:
     def handle_HTTP(self, data):
         request = HTTP_request(data)
         command = request.command
-
         if not command in self.handlers.keys():
             return self.codes["501"](request)
         else:
