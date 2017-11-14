@@ -6,7 +6,6 @@ from datetime import datetime
 import io
 import socket
 import threading
-import time
 import sys
 import os
 
@@ -92,6 +91,7 @@ class server:
         response = self.construct_header("200 OK",self.content_type_text, file_size )
         response = response + "\r\n" + (open(file_name).read())
         print("constructed and sending response")
+
         return bytes(response, "utf8")
 
     def construct_header(self,response_status, content_type, content_length):
