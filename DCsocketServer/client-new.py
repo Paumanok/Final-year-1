@@ -4,7 +4,10 @@
 import socket
 import sys
 import threading
+import time
 
+#0 indexed
+thread_max = 100
 
 class send_spam:
 
@@ -35,13 +38,22 @@ class send_spam:
         sock.close()
         return recv_data
 
+    def spam(self):
+        while True:
+            self.send()
+            time.sleep(.1)
 
 def main():
     spammer = send_spam()
+    threads = []
 
-    while True:
-        spammer.send()
+    for i in range(0,thread_max):
+        t = threading.Thread(target = spammer.spam())
+        t.start()
+        threads.append(t)
 
+    for t in threads:
+        t.join()
 
 
 main()
