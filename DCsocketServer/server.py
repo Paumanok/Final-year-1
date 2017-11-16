@@ -46,6 +46,7 @@ class server:
         size = 1024
         while True:
             try:
+            #if True:
                 data = client.recv(size)
                 print("gotsomething")
                 if data:
@@ -58,7 +59,9 @@ class server:
                     print('cient disconnected')
 
             except:
+            #else:
                 client.close()
+
                 return False
 
         return True
@@ -80,12 +83,16 @@ class server:
         else:
             path = self.running_path + request.path
             print(path)
-            if(os.path.exists(path)):
-                file_size = os.path.getsize(path)
-                file_name = request.path[1:]
+            if(os.access(path, os.R_OK)):
+                if(os.path.exists(path)):
+                    file_size = os.path.getsize(path)
+                    file_name = request.path[1:]
+                else:
+                    print(":it doesnt exist")
+                    return self.codes["404"](request)
             else:
-                print(":it doesnt exist")
-                return self.codes["404"](request)
+                print(":not allowed")
+                return self.codes["403"](request)
 
         response = self.construct_header("200 OK",self.content_type_text, file_size )
         response = response + "\r\n" + (open(file_name).read())
@@ -116,9 +123,10 @@ class server:
         return bytes(response, "utf8")
 
     def HTTP_403(self, request):
+        file_size = os.path.getsize("403.htm")
         response = self.construct_header("403",self.content_type_text, file_size )
         response = response + "\r\n" + (open("403.htm").read())
-        return 0
+        return bytes(response, "utf8")
 
 #executive decision: project not about text parsing, so offload parsing
 #to subset of HTTP library

@@ -31,7 +31,7 @@ class send_spam:
         sock.sendall(message)
 
         while data:
-            data = sock.recv(1024)
+            data = sock.recv(2**20)
             #recv_data += data
             #print('recieved: ' + str(data))
 
@@ -41,7 +41,7 @@ class send_spam:
     def spam(self):
         while True:
             self.send()
-            time.sleep(.1)
+            #time.sleep(.01)
 
 def main():
     spammer = send_spam()
