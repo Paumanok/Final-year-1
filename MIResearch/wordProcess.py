@@ -1,3 +1,17 @@
+from bs4 import BeautifulSoup
+import re
+import nltk
+from nltk.corpus import stopwords # Import the stop word list
+import pandas
+
+nltk.download()  # Download text data sets, including stop words
+
+
+def init():
+    train = pandas.read_csv("data/labeledTrainData.tsv", header=0, \
+                    delimiter="\t", quoting=3)
+
+
 def review_to_words( raw_review ):
     # Function to convert a raw review to a string of words
     # The input is a single string (a raw movie review), and
