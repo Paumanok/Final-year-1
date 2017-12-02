@@ -100,3 +100,5 @@ ENV/
 # mypy
 .mypy_cache/
 notallowed.htm
+tensorflow/*
+MIResearch/tensorflow/*
