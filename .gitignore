@@ -102,3 +102,4 @@ ENV/
 notallowed.htm
 tensorflow/*
 MIResearch/tensorflow/*
+MIResearch/data/*
