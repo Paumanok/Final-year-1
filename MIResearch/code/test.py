@@ -1,4 +1,5 @@
 from processData import processData as p
+from learning import learning as l
 import os
 
 
@@ -53,9 +54,29 @@ def clean(fnList):
 
     return reviews
 
+def trainW2V():
+    training_sets = opd[0:3]
+    ults = p.importTSV("data/" + opd[0])
+    lpts = p.importTSV("data/" + opd[1])
+    lnts = p.importTSV("data/" + opd[2])
+
+    model = l.word2vec(ults, lpts, lnts)
+    #check if model worked
+    model.most_similar("man")
+
+def trainD2V():
+    training_sets = opd[0:3]
+    ults = p.importTSV("data/" + opd[0])
+    lpts = p.importTSV("data/" + opd[1])
+    lnts = p.importTSV("data/" + opd[2])
+
+    model = l.doc2vec(ults, lpts, lnts)
+    #check if model worked
+    model.most_similar("man")
 
 
 def main():
+    trainW2V()
     #filePointers = process()
 
     #reviews = clean(opd)
