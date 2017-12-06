@@ -1,6 +1,9 @@
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
+from KaggleWord2VecUtility import KaggleWord2VecUtility
+from gensim.models import Word2Vec, Doc2vec
+
 
 def bagOfWords(clean_train_reviews):
     # Initialize the "CountVectorizer" object, which is scikit-learn's
@@ -23,12 +26,72 @@ def bagOfWords(clean_train_reviews):
     return train_data_features
 
 
-def word2vec(clean_reviews):
+def word2vec(unlabeledTrain, labeledTrain):
+    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-    return 0
+    sentences = []
+    for review in unlabeledTrain["review"];
+        sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
-def doc2vec(clean_reviews):
+    for review in labeledTrain["review"];
+        sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
+
+    # Set values for various parameters
+    num_features = 300    # Word vector dimensionality
+    min_word_count = 40   # Minimum word count
+    num_workers = 4       # Number of threads to run in parallel
+    context = 10          # Context window size
+    downsampling = 1e-3   # Downsample setting for frequent words
+
+    # Initialize and train the model (this will take some time)
+    print "Training Word2Vec model..."
+    model = Word2Vec(sentences, workers=num_workers, \
+                size=num_features, min_count = min_word_count, \
+                window = context, sample = downsampling, seed=1)
+
+    # If you don't plan to train the model any further, calling
+    # init_sims will make the model much more memory-efficient.
+    model.init_sims(replace=True)
+
+    # It can be helpful to create a meaningful model name and
+    # save the model for later use. You can load it later using Word2Vec.load()
+    model_name = "300features_40minwords_10context"
+    model.save(model_name)
+
+def doc2vec(unlabeledTrain, labeledTrain):
+
+    tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+
+    sentences = []
+    for review in unlabeledTrain["review"];
+        sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
+
+    for review in labeledTrain["review"];
+        sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
+
+
+    # Set values for various parameters
+    num_features = 300    # Word vector dimensionality
+    min_word_count = 40   # Minimum word count
+    num_workers = 4       # Number of threads to run in parallel
+    context = 10          # Context window size
+    downsampling = 1e-3   # Downsample setting for frequent words
+
+    # Initialize and train the model (this will take some time)
+    print "Training Word2Vec model..."
+    model = Doc2Vec(sentences, workers=num_workers, \
+                size=num_features, min_count = min_word_count, \
+                window = context, sample = downsampling, seed=1)
+
+    # If you don't plan to train the model any further, calling
+    # init_sims will make the model much more memory-efficient.
+    model.init_sims(replace=True)
+
+    # It can be helpful to create a meaningful model name and
+    # save the model for later use. You can load it later using Word2Vec.load()
+    model_name = "300features_40minwords_10context_pvec"
+    model.save(model_name)
     return 0
 
 
