@@ -33,7 +33,37 @@ def doc2vec(clean_reviews):
 
 
 def randomForest(trained_model):
-    return 0
+
+    # Initialize a Random Forest classifier with 100 trees
+    forest = RandomForestClassifier(n_estimators = 100)
+
+    # Fit the forest to the training set, using the bag of words as
+    # features and the sentiment labels as the response variable
+    #
+    # This may take a few minutes to run
+    forest = forest.fit( trained_model, train["sentiment"] )
+
+    # Create an empty list and append the clean reviews one by one
+    clean_test_reviews = []
+
+    print "Cleaning and parsing the test set movie reviews...\n"
+    for i in xrange(0,len(test["review"])):
+        clean_test_reviews.append(" ".join(KaggleWord2VecUtility.review_to_wordlist(test["review"][i], True)))
+
+    # Get a bag of words for the test set, and convert to a numpy array
+    test_data_features = vectorizer.transform(clean_test_reviews)
+    np.asarray(test_data_features)
+
+    # Use the random forest to make sentiment label predictions
+    print "Predicting test labels...\n"
+    result = forest.predict(test_data_features)
+
+    # Copy the results to a pandas dataframe with an "id" column and
+    # a "sentiment" column
+    output = pd.DataFrame( data={"id":test["id"], "sentiment":result} )
+
+    # Use pandas to write the comma-separated output file
+    output.to_csv(os.path.join(os.path.dirname(__file__), 'data', 'Bag_of_Words_model.csv'), index=False, quoting=3)
 
 def rnn(trained_model):
     return 0

@@ -5,7 +5,7 @@ import pandas as pd
 
 class processData():
 
-    #@staticmethod
+    @staticmethod
     def loadRaw( dirList, processunsup = False):
         #todo: add functionality to point to data dir
         #      checkfor/create output file
