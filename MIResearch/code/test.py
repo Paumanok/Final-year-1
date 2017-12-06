@@ -56,11 +56,8 @@ def clean(fnList):
 
 
 def main():
-    filePointers = process()
+    #filePointers = process()
 
-    reviews = clean(opd)
-    for key, value in reviews.items():
-        print(key)
-    print(reviews["train_pos"][0])
+    #reviews = clean(opd)
 
 main()
