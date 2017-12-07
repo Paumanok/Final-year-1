@@ -1,9 +1,8 @@
 from os import listdir
 from os.path import isfile, join, splitext
 import pandas as pd
-from nltk.corpus import stopwords
+#from nltk.corpus import stopword
 import nltk.data
-import numpy as np  # Make sure that numpy is imported
 from gensim.models import Word2Vec
 from sklearn.ensemble import RandomForestClassifier
 from KaggleWord2VecUtility import KaggleWord2VecUtility
@@ -79,3 +78,11 @@ class processData():
             reviews["review"] = cleaned_review
 
         return clean_reviews, reviews
+
+    @staticmethod
+    def GetCleanReviews(reviews):
+        clean_reviews = []
+        for review in reviews["review"]:
+            clean_reviews.append( KaggleWord2VecUtility.review_to_wordlist( review, remove_stopwords=True ))
+        return clean_reviews
+

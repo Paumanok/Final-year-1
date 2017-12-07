@@ -1,7 +1,10 @@
 from processData import processData as p
 from learning import learning as l
 import os
-
+#import gensim.models.keyedvectors as word2vec
+from gensim.models import Word2Vec, Doc2Vec
+import gensim
+import pandas as pd
 
 REMOVE_STOP_WORDS = True
 
@@ -56,10 +59,11 @@ def clean(fnList):
 
 def trainW2V():
     training_sets = opd[0:3]
-    ults = p.importTSV("data/" + opd[0])
-    lpts = p.importTSV("data/" + opd[1])
-    lnts = p.importTSV("data/" + opd[2])
-
+    print("importing clean data")
+    ults = p.importTSV("data/" + opd[2])
+    lpts = p.importTSV("data/" + opd[0])
+    lnts = p.importTSV("data/" + opd[1])
+    print("building model")
     model = l.word2vec(ults, lpts, lnts)
     #check if model worked
     model.most_similar("man")
@@ -75,10 +79,20 @@ def trainD2V():
     model.most_similar("man")
 
 
-def main():
-    trainW2V()
-    #filePointers = process()
+def forest_test():
+    lptrs = p.importTSV("data/" + opd[0])
+    lntrs = p.importTSV("data/" + opd[1])
+    lpts = p.importTSV("data/" + opd[3])
+    lnts = p.importTSV("data/" + opd[4])
+    model = Word2Vec.load('300features_40minwords_10context')
+    #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
+    l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
+    print(lptrs.append(lntrs))
 
+def main():
+    #filePointers = process()
     #reviews = clean(opd)
+    #trainW2V()
+    forest_test()
 
 main()
