@@ -76,7 +76,7 @@ class processData():
         for i in range( 0, len(reviews["review"])):
             cleaned_review = " ".join(KaggleWord2VecUtility.review_to_wordlist(reviews["review"][i], removeStopWords))
             clean_reviews.append(cleaned_review)
-            reviews["review"] = cleaned_review
+            reviews["review"][i] = cleaned_review
 
         return clean_reviews, reviews
 

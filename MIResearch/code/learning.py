@@ -193,6 +193,8 @@ class learning():
 
         testDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(testlabel), trained_model, num_features)
 
+        trainlabel[np.isnan(trainlabel)] = np.median(trainlabel[~np.isnan(trainlabel)])
+
         # Initialize a Random Forest classifier with 100 trees
         forest = RandomForestClassifier(n_estimators = 100)
 
