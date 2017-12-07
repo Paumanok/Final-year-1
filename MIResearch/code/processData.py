@@ -4,6 +4,7 @@ import pandas as pd
 #from nltk.corpus import stopword
 import nltk.data
 from gensim.models import Word2Vec
+import gensim
 from sklearn.ensemble import RandomForestClassifier
 from KaggleWord2VecUtility import KaggleWord2VecUtility
 
@@ -69,7 +70,7 @@ class processData():
         return reviews
 
     @staticmethod
-    def cleanData(reviews, removeStopWords=True):
+    def cleanData(reviews, removeStopWords=False):
         #nltk.download()  # Download text data sets, including stop words
         clean_reviews = []
         for i in range( 0, len(reviews["review"])):
@@ -80,9 +81,17 @@ class processData():
         return clean_reviews, reviews
 
     @staticmethod
-    def GetCleanReviews(reviews):
+    def GetCleanReviews(reviews, stopwords = False):
         clean_reviews = []
         for review in reviews["review"]:
-            clean_reviews.append( KaggleWord2VecUtility.review_to_wordlist( review, remove_stopwords=True ))
+            clean_reviews.append( KaggleWord2VecUtility.review_to_wordlist( review, remove_stopwords=stopwords ))
         return clean_reviews
+
+    @staticmethod
+    def genTaggedDoc(reviews, stopwords=False):
+        for review in reviews["review"]:
+            if "sentiment" in reviews:
+                yield gensim.models.doc2vec.TaggedDocument(KaggleWord2VecUtility.review_to_wordlist(review, stopwords), [1])
+            else:
+                yield KaggleWord2VecUtility.review_to_wordlist(review, stopwords)
 

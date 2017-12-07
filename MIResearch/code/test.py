@@ -66,17 +66,16 @@ def trainW2V():
     print("building model")
     model = l.word2vec(ults, lpts, lnts)
     #check if model worked
-    model.most_similar("man")
+    print("did it work?" + model.most_similar("man"))
 
 def trainD2V():
     training_sets = opd[0:3]
-    ults = p.importTSV("data/" + opd[0])
-    lpts = p.importTSV("data/" + opd[1])
-    lnts = p.importTSV("data/" + opd[2])
-
+    ults = p.importTSV("data/" + opd[2])
+    lpts = p.importTSV("data/" + opd[0])
+    lnts = p.importTSV("data/" + opd[1])
+    print("building model")
     model = l.doc2vec(ults, lpts, lnts)
     #check if model worked
-    model.most_similar("man")
 
 
 def forest_test():
@@ -84,15 +83,16 @@ def forest_test():
     lntrs = p.importTSV("data/" + opd[1])
     lpts = p.importTSV("data/" + opd[3])
     lnts = p.importTSV("data/" + opd[4])
-    model = Word2Vec.load('300features_40minwords_10context')
+    model = Doc2Vec.load('300features_40minwords_10context_pvec')
+    print(lptrs.append(lntrs))
     #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
     l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
-    print(lptrs.append(lntrs))
 
 def main():
     #filePointers = process()
     #reviews = clean(opd)
     #trainW2V()
+    trainD2V()
     forest_test()
 
 main()
