@@ -103,3 +103,5 @@ notallowed.htm
 tensorflow/*
 MIResearch/tensorflow/*
 MIResearch/data/*
+300features*
+code/300features*

@@ -200,6 +200,7 @@ class learning():
         # features and the sentiment labels as the response variable
         #
         # This may take a few minutes to run
+        print(trainlabel["sentiment"])
         forest = forest.fit( trainDataVecs, trainlabel["sentiment"] )
 
         # Use the random forest to make sentiment label predictions
