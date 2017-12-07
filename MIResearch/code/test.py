@@ -60,9 +60,9 @@ def clean(fnList):
 def trainW2V():
     training_sets = opd[0:3]
     print("importing clean data")
-    ults = p.importTSV("data/" + opd[2])
-    lpts = p.importTSV("data/" + opd[0])
-    lnts = p.importTSV("data/" + opd[1])
+    ults = p.importTSV("data/clean_" + opd[2])
+    lpts = p.importTSV("data/clean_" + opd[0])
+    lnts = p.importTSV("data/clean_" + opd[1])
     print("building model")
     model = l.word2vec(ults, lpts, lnts)
     #check if model worked
@@ -70,21 +70,21 @@ def trainW2V():
 
 def trainD2V():
     training_sets = opd[0:3]
-    ults = p.importTSV("data/" + opd[2])
-    lpts = p.importTSV("data/" + opd[0])
-    lnts = p.importTSV("data/" + opd[1])
+    ults = p.importTSV("data/clean_" + opd[2])
+    lpts = p.importTSV("data/clean_" + opd[0])
+    lnts = p.importTSV("data/clean_" + opd[1])
     print("building model")
     model = l.doc2vec(ults, lpts, lnts)
     #check if model worked
 
 
 def forest_test():
-    lptrs = p.importTSV("data/" + opd[0])
-    lntrs = p.importTSV("data/" + opd[1])
-    lpts = p.importTSV("data/" + opd[3])
-    lnts = p.importTSV("data/" + opd[4])
+    lptrs = p.importTSV("data/clean_" + opd[0])
+    lntrs = p.importTSV("data/clean_" + opd[1])
+    lpts  = p.importTSV("data/clean_" + opd[3])
+    lnts  = p.importTSV("data/clean_" + opd[4])
     model = Doc2Vec.load('300features_40minwords_10context_pvec')
-    print(lptrs.append(lntrs))
+   # print(lptrs.append(lntrs))
     #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
     l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
 
