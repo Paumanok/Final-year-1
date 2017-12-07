@@ -2,10 +2,15 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from KaggleWord2VecUtility import KaggleWord2VecUtility
-from gensim.models import Word2Vec, Doc2vec
+from gensim.models import Word2Vec, Doc2Vec
+import gensim
+import nltk.data
+from processData import processData as p
+import pandas as pd
 
 class learning():
 
+    @staticmethod
     def bagOfWords(clean_train_reviews):
         # Initialize the "CountVectorizer" object, which is scikit-learn's
         # bag of words tool.
@@ -26,18 +31,18 @@ class learning():
         np.asarray(train_data_features)
         return train_data_features
 
-
+    @staticmethod
     def word2vec(unlabeledTrain, labeledTrainPos, labeledTrainNeg):
         tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
         sentences = []
-        for review in unlabeledTrain["review"];
+        for review in unlabeledTrain["review"]:
             sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
-        for review in labeledTrainPos["review"];
+        for review in labeledTrainPos["review"]:
             sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
-        for review in labeledTrainNeg["review"];
+        for review in labeledTrainNeg["review"]:
             sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
         # Set values for various parameters
@@ -48,7 +53,9 @@ class learning():
         downsampling = 1e-3   # Downsample setting for frequent words
 
         # Initialize and train the model (this will take some time)
-        print "Training Word2Vec model..."
+        print( "Training Word2Vec model...")
+        assert gensim.models.word2vec.FAST_VERSION > -1
+
         model = Word2Vec(sentences, workers=num_workers, \
                     size=num_features, min_count = min_word_count, \
                     window = context, sample = downsampling, seed=1)
@@ -63,15 +70,16 @@ class learning():
         model.save(model_name)
         return model
 
+    @staticmethod
     def doc2vec(unlabeledTrain, labeledTrain):
 
         tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
         sentences = []
-        for review in unlabeledTrain["review"];
+        for review in unlabeledTrain["review"]:
             sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
-        for review in labeledTrain["review"];
+        for review in labeledTrain["review"]:
             sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
 
@@ -83,7 +91,7 @@ class learning():
         downsampling = 1e-3   # Downsample setting for frequent words
 
         # Initialize and train the model (this will take some time)
-        print "Training Word2Vec model..."
+        print("Training Word2Vec model...")
         model = Doc2Vec(sentences, workers=num_workers, \
                     size=num_features, min_count = min_word_count, \
                     window = context, sample = downsampling, seed=1)
@@ -98,8 +106,100 @@ class learning():
         model.save(model_name)
         return 0
 
+    @staticmethod
+    def makeFeatureVec(words, model, num_features):
+        # Function to average all of the word vectors in a given
+        # paragraph
+        #
+        # Pre-initialize an empty numpy array (for speed)
+        featureVec = np.zeros((num_features,),dtype="float32")
+        #
+        nwords = 0.
+        #
+        # Index2word is a list that contains the names of the words in
+        # the model's vocabulary. Convert it to a set, for speed
+        index2word_set = set(model.wv.index2word)
+        #
+        # Loop over each word in the review and, if it is in the model's
+        # vocaublary, add its feature vector to the total
+        for word in words:
+            if word in index2word_set:
+                nwords = nwords + 1.
+                featureVec = np.add(featureVec,model[word])
+        #
+        # Divide the result by the number of words to get the average
+        featureVec = np.divide(featureVec,nwords)
+        return featureVec
 
-    def randomForest(trained_model):
+    @staticmethod
+    def getAvgFeatureVecs(reviews, model, num_features):
+        # Given a set of reviews (each one a list of words), calculate
+        # the average feature vector for each one and return a 2D numpy array
+        #
+        # Initialize a counter
+        counter = 0.
+        #
+        # Preallocate a 2D numpy array, for speed
+        reviewFeatureVecs = np.zeros((len(reviews),num_features),dtype="float32")
+        #
+        # Loop through the reviews
+        for review in reviews:
+           #
+           # Print a status message every 1000th review
+           if counter%1000. == 0.:
+               print(("Review %d of %d") % (counter, len(reviews)))
+           #
+           # Call the function (defined above) that makes average feature vectors
+           reviewFeatureVecs[int(counter)] = learning.makeFeatureVec(review, model, \
+               num_features)
+           #
+           # Increment the counter
+           counter = counter + 1.
+        return reviewFeatureVecs
+
+    @staticmethod
+    def randomForestvec( trained_model, trainlabel,  testlabel, num_features):
+
+        trainDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(trainlabel), trained_model, num_features)
+
+        testDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(testlabel), trained_model, num_features)
+
+        # Initialize a Random Forest classifier with 100 trees
+        forest = RandomForestClassifier(n_estimators = 100)
+
+        # Fit the forest to the training set, using the bag of words as
+        # features and the sentiment labels as the response variable
+        #
+        # This may take a few minutes to run
+        forest = forest.fit( trainDataVecs, trainlabel["sentiment"] )
+
+        # Use the random forest to make sentiment label predictions
+        print( "Predicting test labels...\n")
+        result = forest.predict(testDataVecs)
+
+        # Copy the results to a pandas dataframe with an "id" column and
+        # a "sentiment" column
+        output = pd.DataFrame( data={"id":testlabel["ids"], "sentiment":result} )
+
+        correct = 0
+        incorrect = 0
+        #print(output["sentiment"][1].item())
+        testList = testlabel["sentiment"].tolist()
+        predList = output["sentiment"].tolist()
+        for i in range(0,len(testList)):
+            if testList[i] == predList[i]:
+                correct += 1
+            else:
+                incorrect +=1
+
+        print("accuracy: " + str(correct/(correct+incorrect)))
+
+
+        # Use pandas to write the comma-separated output file
+        #output.to_csv(os.path.join(os.path.dirname(__file__), 'data', 'Bag_of_Words_model.csv'), index=False, quoting=3)
+
+    @staticmethod
+    def randomForestBow(trained_model, test):
 
         # Initialize a Random Forest classifier with 100 trees
         forest = RandomForestClassifier(n_estimators = 100)
@@ -113,7 +213,7 @@ class learning():
         # Create an empty list and append the clean reviews one by one
         clean_test_reviews = []
 
-        print "Cleaning and parsing the test set movie reviews...\n"
+        print("Cleaning and parsing the test set movie reviews...\n")
         for i in xrange(0,len(test["review"])):
             clean_test_reviews.append(" ".join(KaggleWord2VecUtility.review_to_wordlist(test["review"][i], True)))
 
@@ -122,7 +222,7 @@ class learning():
         np.asarray(test_data_features)
 
         # Use the random forest to make sentiment label predictions
-        print "Predicting test labels...\n"
+        print( "Predicting test labels...\n")
         result = forest.predict(test_data_features)
 
         # Copy the results to a pandas dataframe with an "id" column and
@@ -132,5 +232,8 @@ class learning():
         # Use pandas to write the comma-separated output file
         output.to_csv(os.path.join(os.path.dirname(__file__), 'data', 'Bag_of_Words_model.csv'), index=False, quoting=3)
 
+    @staticmethod
     def rnn(trained_model):
+
         return 0
+
