@@ -19,7 +19,7 @@ class KaggleWord2VecUtility(object):
         # optionally removing stop words.  Returns a list of words.
         #
         # 1. Remove HTML
-        review_text = BeautifulSoup(review).get_text()
+        review_text = BeautifulSoup(review, "html5lib").get_text()
         #
         # 2. Remove non-letters
         review_text = re.sub("[^a-zA-Z]"," ", review_text)
