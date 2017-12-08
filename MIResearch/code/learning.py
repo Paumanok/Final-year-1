@@ -78,37 +78,42 @@ class learning():
         tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
         #sentences = []
+        #print("unlabeled...")
         #for review in unlabeledTrain["review"]:
-        #    sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
-
+        #    sentences.append(KaggleWord2VecUtility.review_to_doc(review, [p.hashh(review.encode('utf-8'))]))
+        #print("labeledpos...")
         #for review in labeledTrainPos["review"]:
-        #    sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
+        #    sentences.append(KaggleWord2VecUtility.review_to_doc(review, [p.hashh(review.encode('utf-8'))]))
 
+        #print("labeledneg...")
         #for review in labeledTrainNeg["review"]:
-        #    sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
+        #    sentences.append(KaggleWord2VecUtility.review_to_doc(review, [p.hashh(review.encode('utf-8'))]))
+
 
         cleanreviews, unlabeledTrainDoc = p.cleanData(unlabeledTrain, True)
         cleanreviews2, labeledTrainPosDoc = p.cleanData(labeledTrainPos, True)
         cleanreviews3, labeledTrainNegDoc = p.cleanData(labeledTrainNeg, True)
 
-
+        print(labeledTrainPosDoc.iloc[1])
+        print(labeledTrainPosDoc.iloc[1]["review"])
+#        print(labeledTrainPosDoc[1]["id"])
         document = namedtuple('document', 'id words tags')
         docs = []
         for i in range(0, len(unlabeledTrainDoc)):
-            ids = unlabeledTrainDoc["id"][i]
-            words = unlabeledTrainDoc["review"][i]
+            ids = unlabeledTrainDoc.iloc[i]["id"]
+            words = unlabeledTrainDoc.iloc[i]["review"]
             tags = [i]
             docs.append(document(ids,words,tags))
 
         for i in range(0, len(labeledTrainPosDoc)):
-            ids = labeledTrainPosDoc["ids"][i]
-            words = labeledTrainPosDoc["review"][i]
+            ids = labeledTrainPosDoc.iloc[i]["id"]
+            words = labeledTrainPosDoc.iloc[i]["review"]
             tags = [i]
             docs.append(document(ids,words,tags))
 
         for i in range(0, len(labeledTrainNegDoc)):
-            ids = labeledTrainNegDoc["ids"][i]
-            words = labeledTrainNegDoc["review"][i]
+            ids = labeledTrainNegDoc.iloc[i][ "id"]
+            words = labeledTrainNegDoc.iloc[i]["review"]
             tags = [i]
             docs.append(document(ids,words,tags))
 
@@ -121,17 +126,17 @@ class learning():
 
         # Initialize and train the model (this will take some time)
         print("Training Doc2Vec model...")
-        model = Doc2Vec( workers=num_workers, \
+        model = Doc2Vec(docs, workers=num_workers, \
                     size=num_features, min_count = min_word_count, \
                     window = context, sample = downsampling, seed=1)
         # If you don't plan to train the model any further, calling
         # init_sims will make the model much more memory-efficient.
-        model.build_vocab(docs)
+        #model.build_vocab(docs)
         model.init_sims(replace=True)
 
         # It can be helpful to create a meaningful model name and
         # save the model for later use. You can load it later using Word2Vec.load()
-        model_name = "300features_40minwords_10context_pvec"
+        model_name = ("%dfeatures%dwords%dworkers%dcontext_pvec") % (num_features, min_word_count, num_workers, context)
         model.save(model_name)
         return model
 
@@ -187,22 +192,50 @@ class learning():
         return reviewFeatureVecs
 
     @staticmethod
-    def randomForestvec( trained_model, trainlabel,  testlabel, num_features):
+    def getdoc2VecFeatureVecs(reviews, model, num_features):
+        counter = 0.
+        errorcounter = 0
+        reviewFeatureVecs = np.zeros((len(reviews),num_features),dtype="float32")
+        for review in reviews:
+            #
+            # Print a status message every 1000th review
+            if counter%1000. == 0.:
+                print(( "Review %d of %d") % (counter, len(reviews)))
+            #
+            # Call the function (defined above) that makes average feature vectors
+            try:
+                reviewFeatureVecs[counter] = model[p.hashh(review.encode('utf-8'))]
+            except:
+                print("KeyError at .")
+                errorcounter += 1
 
-        trainDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(trainlabel), trained_model, num_features)
+            #
+            # Increment the counter
+            counter = counter + 1.
+        print(errorcounter)
+        return reviewFeatureVecs
 
-        testDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(testlabel), trained_model, num_features)
+    @staticmethod
+    def randomForestvec( trained_model, trainlabel,  testlabel, num_features, model_type = "w2v"):
 
-        trainlabel[np.isnan(trainlabel)] = np.median(trainlabel[~np.isnan(trainlabel)])
+        if model_type == "w2v":
+            trainDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(trainlabel), trained_model, num_features)
+
+            testDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(testlabel), trained_model, num_features)
+        else:
+            trainDataVecs = learning.getdoc2VecFeatureVecs(trainlabel["review"],trained_model, num_features )
+
+            testDataVecs = learning.getdoc2VecFeatureVecs(testlabel["review"], trained_model, num_features )
+#        trainlabel[np.isnan(trainlabel)] = np.median(trainlabel[~np.isnan(trainlabel)])
 
         # Initialize a Random Forest classifier with 100 trees
-        forest = RandomForestClassifier(n_estimators = 100)
+        forest = RandomForestClassifier(n_estimators = 1000)
 
         # Fit the forest to the training set, using the bag of words as
         # features and the sentiment labels as the response variable
         #
         # This may take a few minutes to run
-        print(trainlabel["sentiment"])
+        #print(len(trainlabel["sentiment"]))
         forest = forest.fit( trainDataVecs, trainlabel["sentiment"] )
 
         # Use the random forest to make sentiment label predictions
@@ -211,7 +244,7 @@ class learning():
 
         # Copy the results to a pandas dataframe with an "id" column and
         # a "sentiment" column
-        output = pd.DataFrame( data={"id":testlabel["ids"], "sentiment":result} )
+        output = pd.DataFrame( data={"id":testlabel["id"], "sentiment":result} )
 
         correct = 0
         incorrect = 0

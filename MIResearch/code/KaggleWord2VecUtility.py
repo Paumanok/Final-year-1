@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 import re
 import nltk
@@ -8,7 +7,7 @@ import numpy as np
 
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
-
+from gensim.models.doc2vec import LabeledSentence
 
 class KaggleWord2VecUtility(object):
     """KaggleWord2VecUtility is a utility class for processing raw HTML text into segments for further learning"""
@@ -57,4 +56,8 @@ class KaggleWord2VecUtility(object):
         # so this returns a list of lists
         return sentences
 
+    @staticmethod
+    def review_to_doc(review,label,  remove_stopwords=False ):
+        labeledSent = LabeledSentence(words= KaggleWord2VecUtility.review_to_wordlist( review, remove_stopwords ), tags=label)
+        return labeledSent
 

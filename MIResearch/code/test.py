@@ -6,7 +6,7 @@ from gensim.models import Word2Vec, Doc2Vec
 import gensim
 import pandas as pd
 
-REMOVE_STOP_WORDS = True
+REMOVE_STOP_WORDS = False
 
 opd = [ "train_pos.tsv",
         "train_neg.tsv",
@@ -47,9 +47,9 @@ def clean(fnList):
 
 
     for fn in fnList:
-        review = p.importTSV(fn)
+        review = p.importTSV("data/" +fn)
         clean_review, clean_review_dataframe  = p.cleanData(review, REMOVE_STOP_WORDS)
-        clean_review_dataframe.to_csv(("clean_" + fn), sep='\t', index=False)
+        clean_review_dataframe.to_csv(("wsw_clean_" + fn), sep='\t', index=False)
         file_name = os.path.splitext(fn)[0]
         reviews.update({file_name : clean_review})
 
@@ -57,33 +57,44 @@ def clean(fnList):
 
     return reviews
 
-def trainW2V():
+def trainW2V(stopwords):
     training_sets = opd[0:3]
+    if stopwords:
+        ver = "wsw_"
+    else:
+        ver = ""
     print("importing clean data")
-    ults = p.importTSV("data/clean_" + opd[2])
-    lpts = p.importTSV("data/clean_" + opd[0])
-    lnts = p.importTSV("data/clean_" + opd[1])
-    print("building model")
+    ults = p.importTSV("data/" + ver + "clean_" + opd[2])
+    lpts = p.importTSV("data/" + ver + "clean_" + opd[0])
+    lnts = p.importTSV("data/" + ver + "clean_" + opd[1])
+    print("building w2v model...")
     model = l.word2vec(ults, lpts, lnts)
     #check if model worked
-    print("did it work?" + model.most_similar("man"))
 
-def trainD2V():
+def trainD2V(stopwords):
     training_sets = opd[0:3]
-    ults = p.importTSV("data/clean_" + opd[2])
-    lpts = p.importTSV("data/clean_" + opd[0])
-    lnts = p.importTSV("data/clean_" + opd[1])
-    print("building model")
+    if stopwords:
+        ver = "wsw_"
+    else:
+        ver = ""
+    ults = p.importTSV("data/" + ver + "clean_" + opd[2])
+    lpts = p.importTSV("data/" + ver + "clean_" + opd[0])
+    lnts = p.importTSV("data/" + ver + "clean_" + opd[1])
+    print("building d2v model...")
     model = l.doc2vec(ults, lpts, lnts)
     #check if model worked
 
 
-def forest_test():
-    lptrs = p.importTSV("data/clean_" + opd[0])
-    lntrs = p.importTSV("data/clean_" + opd[1])
-    lpts  = p.importTSV("data/clean_" + opd[3])
-    lnts  = p.importTSV("data/clean_" + opd[4])
-    model = Doc2Vec.load('300features_40minwords_10context_pvec')
+def forest_test(model,stopwords):
+    if stopwords:
+        ver = "wsw_"
+    else:
+        ver = ""
+    lptrs = p.importTSV("data/" + ver + "clean_" + opd[0])
+    lntrs = p.importTSV("data/" + ver + "clean_" + opd[1])
+    lpts  = p.importTSV("data/" + ver + "clean_" + opd[3])
+    lnts  = p.importTSV("data/" + ver + "clean_" + opd[4])
+    model = Doc2Vec.load(model)
    # print(lptrs.append(lntrs))
     #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
     l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
@@ -91,8 +102,9 @@ def forest_test():
 def main():
     #filePointers = process()
     #reviews = clean(opd)
-    #trainW2V()
-    trainD2V()
-    forest_test()
+    #trainW2V(True)
+#    trainD2V(True)
+# forest_test(300features_40minwords_10context)
+    forest_test("300features40words4workers10context_pvec",True)
 
 main()
