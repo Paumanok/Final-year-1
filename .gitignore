@@ -105,5 +105,6 @@ MIResearch/tensorflow/*
 MIResearch/data/*
 300features*
 code/300features*
-MIResearch/code/data/*.tsv
+MIResearch/code/data/*
 MIResearch/code/models/*
+MIResearch/code/data_tmp
