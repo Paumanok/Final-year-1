@@ -11,7 +11,7 @@ from collections import namedtuple
 
 
 class learning():
-
+    quiet = True
     @staticmethod
     def bagOfWords(clean_train_reviews):
         # Initialize the "CountVectorizer" object, which is scikit-learn's
@@ -91,7 +91,7 @@ class learning():
         docs = []
         for i in range(0, len(unlabeledTrain)):
             ids = unlabeledTrain.iloc[i]["id"]
-            words = unlabeledTrain.iloc[i]["review"]#.split(" ")
+            words = unlabeledTrain.iloc[i]["review"]
             if i == 1: print(words)
             words = words.split(" ")
             if i==1: print(words)
@@ -100,13 +100,13 @@ class learning():
 
         for i in range(0, len(labeledTrainPos)):
             ids = labeledTrainPos.iloc[i]["id"]
-            words = labeledTrainPos.iloc[i]["review"]#.split(" ")
+            words = labeledTrainPos.iloc[i]["review"]
             tags = [i]
             docs.append(document(ids,words,tags))
 
         for i in range(0, len(labeledTrainNeg)):
             ids = labeledTrainNeg.iloc[i][ "id"]
-            words = labeledTrainNeg.iloc[i]["review"]#.split(" ")
+            words = labeledTrainNeg.iloc[i]["review"]
             tags = [i]
             docs.append(document(ids,words,tags))
 
@@ -179,7 +179,7 @@ class learning():
         for review in reviews:
            #
            # Print a status message every 1000th review
-           if counter%1000. == 0.:
+           if counter%1000. == 0. and not True:
                print(("Review %d of %d") % (counter, len(reviews)))
            #
            # Call the function (defined above) that makes average feature vectors
@@ -190,42 +190,13 @@ class learning():
            counter = counter + 1.
         return reviewFeatureVecs
 
-    @staticmethod
-    def getdoc2VecFeatureVecs(reviews, model, num_features):
-        counter = 0.
-        errorcounter = 0
-        reviewFeatureVecs = np.zeros((len(reviews),num_features),dtype="float32")
-        for review in reviews:
-            #
-            # Print a status message every 1000th review
-            if counter%1000. == 0.:
-                print(( "Review %d of %d") % (counter, len(reviews)))
-            #
-            # Call the function (defined above) that makes average feature vectors
-            try:
-                reviewFeatureVecs[counter] = model[p.hashh(review.encode('utf-8'))]
-            except:
-                print("KeyError at .")
-                errorcounter += 1
-
-            #
-            # Increment the counter
-            counter = counter + 1.
-        print(errorcounter)
-        return reviewFeatureVecs
 
     @staticmethod
     def randomForestvec( trained_model, trainlabel,  testlabel, num_features, model_type = "w2v"):
 
-        if model_type == "w2v":
-        #if True:
-            trainDataVecs = learning.getAvgFeatureVecs(trainlabel["review"], trained_model, num_features)
+        trainDataVecs = learning.getAvgFeatureVecs(trainlabel["review"], trained_model, num_features)
 
-            testDataVecs = learning.getAvgFeatureVecs(testlabel["review"], trained_model, num_features)
-        else:
-            trainDataVecs = learning.getdoc2VecFeatureVecs(trainlabel["review"],trained_model, num_features )
-
-            testDataVecs = learning.getdoc2VecFeatureVecs(testlabel["review"], trained_model, num_features )
+        testDataVecs = learning.getAvgFeatureVecs(testlabel["review"], trained_model, num_features)
 
 
         print("number of nan " + str(len(trainDataVecs[np.isnan(trainDataVecs)])))

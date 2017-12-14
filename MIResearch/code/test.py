@@ -1,3 +1,9 @@
+##test.py -- ties all the helper functions together and feeds them data
+#Author: Matthew Smith mrs9107@g.rit.edu
+#Date: 12/14/2017
+#
+#
+
 from processData import processData as p
 from learning import learning as l
 import os
@@ -72,7 +78,6 @@ def trainW2V(stopwords):
     lnts = p.importTSV("data/" + ver + "clean_" + opd[1])
     print("building w2v model...")
     model = l.word2vec(ults, lpts, lnts)
-    #check if model worked
 
 def trainD2V(stopwords):
     training_sets = opd[0:3]
@@ -85,7 +90,6 @@ def trainD2V(stopwords):
     lnts = p.importTSV("data/" + ver + "clean_" + opd[1])
     print("building d2v model...")
     model = l.doc2vec(ults, lpts, lnts)
-    #check if model worked
 
 def trainBOW(stopwords):
     if stopwords:
@@ -111,8 +115,6 @@ def forest_test(model,stopwords, method):
         model = Doc2Vec.load("models/"+model)
     else:
         model = Word2Vec.load("models/"+model)
-   # print(lptrs.append(lntrs))
-    #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
     l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
 
 def forest_test_bow(model,stopwords, vec):
@@ -124,20 +126,20 @@ def forest_test_bow(model,stopwords, vec):
     lntrs = p.importTSV("data/" + ver + "clean_" + opd[1])
     lpts  = p.importTSV("data/" + ver + "clean_" + opd[3])
     lnts  = p.importTSV("data/" + ver + "clean_" + opd[4])
-   # print(lptrs.append(lntrs))
-    #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
     l.randomForestBow(model,lptrs.append(lntrs),lpts.append(lnts), vec)
 
 
 def main():
-    #filePointers = process()
-    #clean(opd, True) #dont remove stopwords
-    #clean(opd, False) #remove em
-   # trainW2V(True)
-    #trainD2V(True)
-    #model,vec = trainBOW(False)
-    #forest_test("300features40words4workers10context", True, "w2v")
-    forest_test("300features40words4workers10context_pvec",True)
-    #forest_test_bow(model, False, vec)
+    firstRun = False
+    if firstRun:
+        filePointers = process()
+        clean(opd, True) #dont remove stopwords
+        clean(opd, False) #remove em
+        trainW2V(True)
+        trainD2V(True)
+    forest_test("300features40words4workers10context", True, "w2v")
+    forest_test("300features40words4workers10context_pvec",True, "d2v")
+    model,vec = trainBOW(False)
+    forest_test_bow(model, False, vec)
 
 main()

@@ -7,7 +7,6 @@ from gensim.models import Word2Vec
 import gensim
 from sklearn.ensemble import RandomForestClassifier
 from KaggleWord2VecUtility import KaggleWord2VecUtility
-import hashlib
 
 class processData():
 
@@ -83,7 +82,7 @@ class processData():
     @staticmethod
     def cleanDataSent(reviews, removeStopWords=False):
         clean_reviews = []
-        for i in range( 0, len(reviews["review"])):
+        for review in reviews:
             cleaned_review = " ".join(KaggleWord2VecUtility.review_to_sentences(reviews.iloc[i]["review"], removeStopWords))
             clean_reviews.append(cleaned_review)
             reviews.loc[i, 'review'] = cleaned_review
@@ -104,8 +103,4 @@ class processData():
                 yield gensim.models.doc2vec.TaggedDocument(KaggleWord2VecUtility.review_to_wordlist(review, stopwords), [1])
             else:
                 yield KaggleWord2VecUtility.review_to_wordlist(review, stopwords)
-
-    @staticmethod
-    def hashh(text):
-        return hashlib.md5(text).hexdigest()
 
