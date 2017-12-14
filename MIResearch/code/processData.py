@@ -94,7 +94,7 @@ class processData():
     def GetCleanReviews(reviews, stopwords = False):
         clean_reviews = []
         for review in reviews["review"]:
-            clean_reviews.append( KaggleWord2VecUtility.review_to_wordlist( review, remove_stopwords=stopwords ))
+            clean_reviews.append( " ".join(KaggleWord2VecUtility.review_to_wordlist( review, remove_stopwords=stopwords )))
         return clean_reviews
 
     @staticmethod

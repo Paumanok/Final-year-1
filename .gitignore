@@ -105,3 +105,4 @@ MIResearch/tensorflow/*
 MIResearch/data/*
 300features*
 code/300features*
+MIResearch/code/data/*.tsv

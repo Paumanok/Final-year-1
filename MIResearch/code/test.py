@@ -6,7 +6,6 @@ from gensim.models import Word2Vec, Doc2Vec
 import gensim
 import pandas as pd
 
-REMOVE_STOP_WORDS = False
 
 opd = [ "train_pos.tsv",
         "train_neg.tsv",
@@ -40,16 +39,20 @@ def process():
     filePointers = [trpfp, trnfp, trufp, tp, tn ]
     return filePointers, opd
 
-def clean(fnList):
+def clean(fnList, stopwords):
     print("gonna clean!")
 
     reviews = {}
 
+    if stopwords:
+        ver = "wsw_"
+    else:
+        ver = ""
 
     for fn in fnList:
         review = p.importTSV("data/" +fn)
-        clean_review, clean_review_dataframe  = p.cleanData(review, REMOVE_STOP_WORDS)
-        clean_review_dataframe.to_csv(("wsw_clean_" + fn), sep='\t', index=False)
+        clean_review, clean_review_dataframe  = p.cleanData(review, not stopwords)
+        clean_review_dataframe.to_csv(("data/" + ver +"clean_" + fn), sep='\t', index=False)
         file_name = os.path.splitext(fn)[0]
         reviews.update({file_name : clean_review})
 
@@ -84,8 +87,18 @@ def trainD2V(stopwords):
     model = l.doc2vec(ults, lpts, lnts)
     #check if model worked
 
+def trainBOW(stopwords):
+    if stopwords:
+        ver = "wsw_"
+    else:
+        ver = ""
+    lpts = p.importTSV("data/" + ver + "clean_" + opd[0])
+    lnts = p.importTSV("data/" + ver + "clean_" + opd[1])
+    print("building bow model...")
+    model_array, vec = l.bagOfWords(lpts.append(lnts))
+    return model_array, vec
 
-def forest_test(model,stopwords):
+def forest_test(model,stopwords, method):
     if stopwords:
         ver = "wsw_"
     else:
@@ -94,17 +107,37 @@ def forest_test(model,stopwords):
     lntrs = p.importTSV("data/" + ver + "clean_" + opd[1])
     lpts  = p.importTSV("data/" + ver + "clean_" + opd[3])
     lnts  = p.importTSV("data/" + ver + "clean_" + opd[4])
-    model = Doc2Vec.load(model)
+    if(method == "d2v"):
+        model = Doc2Vec.load(model)
+    else:
+        model = Word2Vec.load(model)
    # print(lptrs.append(lntrs))
     #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
     l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
 
+def forest_test_bow(model,stopwords, vec):
+    if stopwords:
+        ver = "wsw_"
+    else:
+        ver = ""
+    lptrs = p.importTSV("data/" + ver + "clean_" + opd[0])
+    lntrs = p.importTSV("data/" + ver + "clean_" + opd[1])
+    lpts  = p.importTSV("data/" + ver + "clean_" + opd[3])
+    lnts  = p.importTSV("data/" + ver + "clean_" + opd[4])
+   # print(lptrs.append(lntrs))
+    #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
+    l.randomForestBow(model,lptrs.append(lntrs),lpts.append(lnts), vec)
+
+
 def main():
     #filePointers = process()
-    #reviews = clean(opd)
+    #clean(opd, True)
+    #clean(opd, False)
     #trainW2V(True)
-#    trainD2V(True)
-# forest_test(300features_40minwords_10context)
-    forest_test("300features40words4workers10context_pvec",True)
+    trainD2V(False)
+    #model,vec = trainBOW(False)
+#    forest_test("300features_40minwords_10context", True, "w2v")
+    forest_test("300features40words4workers10context_pvec",False, "w2v")
+    #forest_test_bow(model, False, vec)
 
 main()

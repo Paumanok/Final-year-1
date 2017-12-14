@@ -20,18 +20,23 @@ class learning():
                                  tokenizer = None,    \
                                  preprocessor = None, \
                                  stop_words = None,   \
-                                 max_features = 5000)
+                                 max_features = 1000)
 
         # fit_transform() does two functions: First, it fits the model
         # and learns the vocabulary; second, it transforms our training data
         # into feature vectors. The input to fit_transform should be a list of
         # strings.
-        train_data_features = vectorizer.fit_transform(clean_train_reviews)
+        reviews = []#clean_train_reviews["review"]
 
+        for review in clean_train_reviews["review"]:
+            reviews.append(review)
+        train_data_features = vectorizer.fit_transform(reviews)
+        #print(pd.DataFrame(train_data_features.A, columns=vectorizer.get_feature_names()).to_string())
         # Numpy arrays are easy to work with, so convert the result to an
         # array
         np.asarray(train_data_features)
-        return train_data_features
+        print(train_data_features.A)
+        return train_data_features, vectorizer
 
     @staticmethod
     def word2vec(unlabeledTrain, labeledTrainPos, labeledTrainNeg):
@@ -77,48 +82,31 @@ class learning():
 
         tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-        #sentences = []
-        #print("unlabeled...")
-        #for review in unlabeledTrain["review"]:
-        #    sentences.append(KaggleWord2VecUtility.review_to_doc(review, [p.hashh(review.encode('utf-8'))]))
-        #print("labeledpos...")
-        #for review in labeledTrainPos["review"]:
-        #    sentences.append(KaggleWord2VecUtility.review_to_doc(review, [p.hashh(review.encode('utf-8'))]))
-
-        #print("labeledneg...")
-        #for review in labeledTrainNeg["review"]:
-        #    sentences.append(KaggleWord2VecUtility.review_to_doc(review, [p.hashh(review.encode('utf-8'))]))
-
-
-        cleanreviews, unlabeledTrainDoc = p.cleanData(unlabeledTrain, True)
-        cleanreviews2, labeledTrainPosDoc = p.cleanData(labeledTrainPos, True)
-        cleanreviews3, labeledTrainNegDoc = p.cleanData(labeledTrainNeg, True)
-
-        print(labeledTrainPosDoc.iloc[1])
-        print(labeledTrainPosDoc.iloc[1]["review"])
+        print(labeledTrainPos.iloc[1])
+        print(labeledTrainPos.iloc[1]["review"])
 #        print(labeledTrainPosDoc[1]["id"])
         document = namedtuple('document', 'id words tags')
         docs = []
-        for i in range(0, len(unlabeledTrainDoc)):
-            ids = unlabeledTrainDoc.iloc[i]["id"]
-            words = unlabeledTrainDoc.iloc[i]["review"]
+        for i in range(0, len(unlabeledTrain)):
+            ids = unlabeledTrain.iloc[i]["id"]
+            words = unlabeledTrain.iloc[i]["review"]# .split(" ")
             tags = [i]
             docs.append(document(ids,words,tags))
 
-        for i in range(0, len(labeledTrainPosDoc)):
-            ids = labeledTrainPosDoc.iloc[i]["id"]
-            words = labeledTrainPosDoc.iloc[i]["review"]
+        for i in range(0, len(labeledTrainPos)):
+            ids = labeledTrainPos.iloc[i]["id"]
+            words = labeledTrainPos.iloc[i]["review"]# .split(" ")
             tags = [i]
             docs.append(document(ids,words,tags))
 
-        for i in range(0, len(labeledTrainNegDoc)):
-            ids = labeledTrainNegDoc.iloc[i][ "id"]
-            words = labeledTrainNegDoc.iloc[i]["review"]
+        for i in range(0, len(labeledTrainNeg)):
+            ids = labeledTrainNeg.iloc[i][ "id"]
+            words = labeledTrainNeg.iloc[i]["review"]#.split(" ")
             tags = [i]
             docs.append(document(ids,words,tags))
 
         # Set values for various parameters
-        num_features = 300    # Word vector dimensionality
+        num_features = 600    # Word vector dimensionality
         min_word_count = 40   # Minimum word count
         num_workers = 4       # Number of threads to run in parallel
         context = 10          # Context window size
@@ -159,9 +147,15 @@ class learning():
         for word in words:
             if word in index2word_set:
                 nwords = nwords + 1.
-                featureVec = np.add(featureVec,model[word])
+                try:
+                    featureVec = np.add(featureVec,model[word])
+                    nwords = nwords + 1.
+                except:
+                    print("word not in model" + word)
         #
+
         # Divide the result by the number of words to get the average
+
         featureVec = np.divide(featureVec,nwords)
         return featureVec
 
@@ -218,7 +212,8 @@ class learning():
     @staticmethod
     def randomForestvec( trained_model, trainlabel,  testlabel, num_features, model_type = "w2v"):
 
-        if model_type == "w2v":
+        #if model_type == "w2v":
+        if True:
             trainDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(trainlabel), trained_model, num_features)
 
             testDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(testlabel), trained_model, num_features)
@@ -226,7 +221,11 @@ class learning():
             trainDataVecs = learning.getdoc2VecFeatureVecs(trainlabel["review"],trained_model, num_features )
 
             testDataVecs = learning.getdoc2VecFeatureVecs(testlabel["review"], trained_model, num_features )
-#        trainlabel[np.isnan(trainlabel)] = np.median(trainlabel[~np.isnan(trainlabel)])
+
+
+        print("number of nan " + str(len(trainDataVecs[np.isnan(trainDataVecs)])))
+        print(trainDataVecs[np.isnan(trainDataVecs)])
+        trainDataVecs[np.isnan(trainDataVecs)] = np.median(trainDataVecs[~np.isnan(trainDataVecs)])
 
         # Initialize a Random Forest classifier with 100 trees
         forest = RandomForestClassifier(n_estimators = 1000)
@@ -264,26 +263,30 @@ class learning():
         #output.to_csv(os.path.join(os.path.dirname(__file__), 'data', 'Bag_of_Words_model.csv'), index=False, quoting=3)
 
     @staticmethod
-    def randomForestBow(trained_model, test):
+    def randomForestBow(trained_model,trainlabel, testlabel,vec):
 
         # Initialize a Random Forest classifier with 100 trees
-        forest = RandomForestClassifier(n_estimators = 100)
+        forest = RandomForestClassifier(n_estimators = 700)
 
         # Fit the forest to the training set, using the bag of words as
         # features and the sentiment labels as the response variable
         #
         # This may take a few minutes to run
-        forest = forest.fit( trained_model, train["sentiment"] )
+        print(trained_model.shape)
+        forest = forest.fit( trained_model, trainlabel["sentiment"] )
 
         # Create an empty list and append the clean reviews one by one
         clean_test_reviews = []
 
         print("Cleaning and parsing the test set movie reviews...\n")
-        for i in xrange(0,len(test["review"])):
-            clean_test_reviews.append(" ".join(KaggleWord2VecUtility.review_to_wordlist(test["review"][i], True)))
+        #for i in range(0,len(test["review"])):
+         #   clean_test_reviews.append(" ".join(KaggleWord2VecUtility.review_to_wordlist(testlabel["review"][i], True)))
+
+        for review in testlabel["review"]:
+            clean_test_reviews.append(review)
 
         # Get a bag of words for the test set, and convert to a numpy array
-        test_data_features = vectorizer.transform(clean_test_reviews)
+        test_data_features = vec.transform(clean_test_reviews)
         np.asarray(test_data_features)
 
         # Use the random forest to make sentiment label predictions
@@ -292,10 +295,22 @@ class learning():
 
         # Copy the results to a pandas dataframe with an "id" column and
         # a "sentiment" column
-        output = pd.DataFrame( data={"id":test["id"], "sentiment":result} )
+        output = pd.DataFrame( data={"id":testlabel["id"], "sentiment":result} )
 
+        correct = 0
+        incorrect = 0
+        #print(output["sentiment"][1].item())
+        testList = testlabel["sentiment"].tolist()
+        predList = output["sentiment"].tolist()
+        for i in range(0,len(testList)):
+            if testList[i] == predList[i]:
+                correct += 1
+            else:
+                incorrect +=1
+
+        print("accuracy: " + str(correct/(correct+incorrect)))
         # Use pandas to write the comma-separated output file
-        output.to_csv(os.path.join(os.path.dirname(__file__), 'data', 'Bag_of_Words_model.csv'), index=False, quoting=3)
+        #output.to_csv(os.path.join(os.path.dirname(__file__), 'data', 'Bag_of_Words_model.csv'), index=False, quoting=3)
 
     @staticmethod
     def rnn(trained_model):
