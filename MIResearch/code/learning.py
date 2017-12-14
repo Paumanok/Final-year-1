@@ -73,7 +73,9 @@ class learning():
 
         # It can be helpful to create a meaningful model name and
         # save the model for later use. You can load it later using Word2Vec.load()
-        model_name = "300features_40minwords_10context"
+#        model_name = "models/300features_40minwords_10context"
+
+        model_name = ("models/%dfeatures%dwords%dworkers%dcontext") % (num_features, min_word_count, num_workers, context)
         model.save(model_name)
         return model
 
@@ -89,13 +91,16 @@ class learning():
         docs = []
         for i in range(0, len(unlabeledTrain)):
             ids = unlabeledTrain.iloc[i]["id"]
-            words = unlabeledTrain.iloc[i]["review"]# .split(" ")
+            words = unlabeledTrain.iloc[i]["review"]#.split(" ")
+            if i == 1: print(words)
+            words = words.split(" ")
+            if i==1: print(words)
             tags = [i]
             docs.append(document(ids,words,tags))
 
         for i in range(0, len(labeledTrainPos)):
             ids = labeledTrainPos.iloc[i]["id"]
-            words = labeledTrainPos.iloc[i]["review"]# .split(" ")
+            words = labeledTrainPos.iloc[i]["review"]#.split(" ")
             tags = [i]
             docs.append(document(ids,words,tags))
 
@@ -124,7 +129,7 @@ class learning():
 
         # It can be helpful to create a meaningful model name and
         # save the model for later use. You can load it later using Word2Vec.load()
-        model_name = ("%dfeatures%dwords%dworkers%dcontext_pvec") % (num_features, min_word_count, num_workers, context)
+        model_name = ("models/%dfeatures%dwords%dworkers%dcontext_pvec") % (num_features, min_word_count, num_workers, context)
         model.save(model_name)
         return model
 
@@ -178,7 +183,7 @@ class learning():
                print(("Review %d of %d") % (counter, len(reviews)))
            #
            # Call the function (defined above) that makes average feature vectors
-           reviewFeatureVecs[int(counter)] = learning.makeFeatureVec(review, model, \
+           reviewFeatureVecs[int(counter)] = learning.makeFeatureVec(review.split(' '), model, \
                num_features)
            #
            # Increment the counter
@@ -212,11 +217,11 @@ class learning():
     @staticmethod
     def randomForestvec( trained_model, trainlabel,  testlabel, num_features, model_type = "w2v"):
 
-        #if model_type == "w2v":
-        if True:
-            trainDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(trainlabel), trained_model, num_features)
+        if model_type == "w2v":
+        #if True:
+            trainDataVecs = learning.getAvgFeatureVecs(trainlabel["review"], trained_model, num_features)
 
-            testDataVecs = learning.getAvgFeatureVecs(p.GetCleanReviews(testlabel), trained_model, num_features)
+            testDataVecs = learning.getAvgFeatureVecs(testlabel["review"], trained_model, num_features)
         else:
             trainDataVecs = learning.getdoc2VecFeatureVecs(trainlabel["review"],trained_model, num_features )
 
@@ -228,7 +233,7 @@ class learning():
         trainDataVecs[np.isnan(trainDataVecs)] = np.median(trainDataVecs[~np.isnan(trainDataVecs)])
 
         # Initialize a Random Forest classifier with 100 trees
-        forest = RandomForestClassifier(n_estimators = 1000)
+        forest = RandomForestClassifier(n_estimators = 100)
 
         # Fit the forest to the training set, using the bag of words as
         # features and the sentiment labels as the response variable

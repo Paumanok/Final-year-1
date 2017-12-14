@@ -108,9 +108,9 @@ def forest_test(model,stopwords, method):
     lpts  = p.importTSV("data/" + ver + "clean_" + opd[3])
     lnts  = p.importTSV("data/" + ver + "clean_" + opd[4])
     if(method == "d2v"):
-        model = Doc2Vec.load(model)
+        model = Doc2Vec.load("models/"+model)
     else:
-        model = Word2Vec.load(model)
+        model = Word2Vec.load("models/"+model)
    # print(lptrs.append(lntrs))
     #word2vec.KeyedVectors.load_word2vec_format('300features_40minwords_10context', binary=True)
     l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
@@ -131,13 +131,13 @@ def forest_test_bow(model,stopwords, vec):
 
 def main():
     #filePointers = process()
-    #clean(opd, True)
-    #clean(opd, False)
-    #trainW2V(True)
-    trainD2V(False)
+    #clean(opd, True) #dont remove stopwords
+    #clean(opd, False) #remove em
+   # trainW2V(True)
+    #trainD2V(True)
     #model,vec = trainBOW(False)
-#    forest_test("300features_40minwords_10context", True, "w2v")
-    forest_test("300features40words4workers10context_pvec",False, "w2v")
+    #forest_test("300features40words4workers10context", True, "w2v")
+    forest_test("300features40words4workers10context_pvec",True)
     #forest_test_bow(model, False, vec)
 
 main()
