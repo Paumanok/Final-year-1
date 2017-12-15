@@ -11,7 +11,6 @@ from collections import namedtuple
 
 
 class learning():
-    quiet = True
     @staticmethod
     def bagOfWords(clean_train_reviews):
         # Initialize the "CountVectorizer" object, which is scikit-learn's
@@ -31,7 +30,6 @@ class learning():
         for review in clean_train_reviews["review"]:
             reviews.append(review)
         train_data_features = vectorizer.fit_transform(reviews)
-        #print(pd.DataFrame(train_data_features.A, columns=vectorizer.get_feature_names()).to_string())
         # Numpy arrays are easy to work with, so convert the result to an
         # array
         np.asarray(train_data_features)
@@ -56,7 +54,7 @@ class learning():
         num_features = 300    # Word vector dimensionality
         min_word_count = 40   # Minimum word count
         num_workers = 4       # Number of threads to run in parallel
-        context = 10          # Context window size
+        context = 20          # Context window size
         downsampling = 1e-3   # Downsample setting for frequent words
 
         # Initialize and train the model (this will take some time)
@@ -73,7 +71,6 @@ class learning():
 
         # It can be helpful to create a meaningful model name and
         # save the model for later use. You can load it later using Word2Vec.load()
-#        model_name = "models/300features_40minwords_10context"
 
         model_name = ("models/%dfeatures%dwords%dworkers%dcontext") % (num_features, min_word_count, num_workers, context)
         model.save(model_name)
@@ -84,9 +81,6 @@ class learning():
 
         tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-        print(labeledTrainPos.iloc[1])
-        print(labeledTrainPos.iloc[1]["review"])
-#        print(labeledTrainPosDoc[1]["id"])
         document = namedtuple('document', 'id words tags')
         docs = []
         for i in range(0, len(unlabeledTrain)):
@@ -114,7 +108,7 @@ class learning():
         num_features = 300    # Word vector dimensionality
         min_word_count = 40   # Minimum word count
         num_workers = 4       # Number of threads to run in parallel
-        context = 10          # Context window size
+        context = 20          # Context window size
         downsampling = 1e-3   # Downsample setting for frequent words
 
         # Initialize and train the model (this will take some time)
@@ -232,7 +226,7 @@ class learning():
             else:
                 incorrect +=1
 
-        print("accuracy: " + str(correct/(correct+incorrect)))
+        print(model_type +" accuracy: " + str(correct/(correct+incorrect)))
 
 
         # Use pandas to write the comma-separated output file
@@ -242,7 +236,7 @@ class learning():
     def randomForestBow(trained_model,trainlabel, testlabel,vec):
 
         # Initialize a Random Forest classifier with 100 trees
-        forest = RandomForestClassifier(n_estimators = 700)
+        forest = RandomForestClassifier(n_estimators = 100)
 
         # Fit the forest to the training set, using the bag of words as
         # features and the sentiment labels as the response variable

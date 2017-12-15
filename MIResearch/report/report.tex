@@ -1,57 +1,4 @@
 
-%% bare_jrnl.tex
-%% V1.3
-%% 2007/01/11
-%% by Michael Shell
-%% see http://www.michaelshell.org/
-%% for current contact information.
-%%
-%% This is a skeleton file demonstrating the use of IEEEtran.cls
-%% (requires IEEEtran.cls version 1.7 or later) with an IEEE journal paper.
-%%
-%% Support sites:
-%% http://www.michaelshell.org/tex/ieeetran/
-%% http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
-%% and
-%% http://www.ieee.org/
-
-
-
-% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
-% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
-% *** with production work. IEEE's font choices can trigger bugs that do  ***
-% *** not appear when using other class files.                            ***
-% The testflow support page is at:
-% http://www.michaelshell.org/tex/testflow/
-
-
-%%*************************************************************************
-%% Legal Notice:
-%% This code is offered as-is without any warranty either expressed or
-%% implied; without even the implied warranty of MERCHANTABILITY or
-%% FITNESS FOR A PARTICULAR PURPOSE! 
-%% User assumes all risk.
-%% In no event shall IEEE or any contributor to this code be liable for
-%% any damages or losses, including, but not limited to, incidental,
-%% consequential, or any other damages, resulting from the use or misuse
-%% of any information contained here.
-%%
-%% All comments are the opinions of their respective authors and are not
-%% necessarily endorsed by the IEEE.
-%%
-%% This work is distributed under the LaTeX Project Public License (LPPL)
-%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
-%% distributed and modified. A copy of the LPPL, version 1.3, is included
-%% in the base LaTeX documentation of all distributions of LaTeX released
-%% 2003/12/01 or later.
-%% Retain all contribution notices and credits.
-%% ** Modified files should be clearly indicated as such, including  **
-%% ** renaming them and changing author support contact information. **
-%%
-%% File list of work: IEEEtran.cls, IEEEtran_HOWTO.pdf, bare_adv.tex,
-%%                    bare_conf.tex, bare_jrnl.tex, bare_jrnl_compsoc.tex
-%%*************************************************************************
-
 % Note that the a4paper option is mainly intended so that authors in
 % countries using A4 can easily print to A4 and see how their papers will
 % look in print - the typesetting of the document will not typically be
@@ -69,36 +16,9 @@
 \usepackage{float}
 \usepackage[font={small}]{caption}
 
-% Some very useful LaTeX packages include:
-% (uncomment the ones you want to load)
-
-
-% *** MISC UTILITY PACKAGES ***
-%
-%\usepackage{ifpdf}
-% Heiko Oberdiek's ifpdf.sty is very useful if you need conditional
-% compilation based on whether the output is pdf or dvi.
-% usage:
-% \ifpdf
-%   % pdf code
-% \else
-%   % dvi code
-% \fi
-% The latest version of ifpdf.sty can be obtained from:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/oberdiek/
-% Also, note that IEEEtran.cls V1.7 and later provides a builtin
-% \ifCLASSINFOpdf conditional that works the same way.
-% When switching from latex to pdflatex and vice-versa, the compiler may
-% have to be run twice to clear warning/error messages.
-
-
-
-
-
-
 % *** CITATION PACKAGES ***
 %
-%\usepackage{cite}
+\usepackage{cite}
 % cite.sty was written by Donald Arseneau
 % V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
 % \cite{} output to follow that of IEEE. Loading the cite package will
@@ -115,14 +35,10 @@
 % The documentation is contained in the cite.sty file itself.
 
 
-
-
-
-
 % *** GRAPHICS RELATED PACKAGES ***
 %
 \ifCLASSINFOpdf
-  % \usepackage[pdftex]{graphicx}
+% \usepackage[pdftex]{graphicx}
   % declare the path(s) where your graphic files are
   % \graphicspath{{../pdf/}{../jpeg/}}
   % and their extensions so you won't have to specify these with
@@ -362,7 +278,7 @@
 
 % *** PDF, URL AND HYPERLINK PACKAGES ***
 %
-%\usepackage{url}
+\usepackage{url}
 % url.sty was written by Donald Arseneau. It provides better support for
 % handling and breaking URLs. url.sty is already installed on most LaTeX
 % systems. The latest version can be obtained at:
@@ -463,7 +379,7 @@
 \begin{abstract}
 %\boldmath
 %\blindtext[1]
-In language, sentiment is a major component of overall expression. Sentiment analysis and classification uses traditional machine learning techniques but learns to predict what the text is trying to express. In this paper we will survey, discuss, and compare various techniques for sentiment classification. Such techniques include older methods such as bag of words classification and more modern techniques such as neural net classification. Some of these methods were implemented and tested on the IMDB movie review dataset. This dataset expresses the star review system as a binary value, where greater than seven is a ‘1’, and less than five is a ‘0’ and <find out what happens in between>.These tests showed <results go here>
+In language, sentiment is a major component of overall expression. Sentiment analysis and classification uses traditional machine learning techniques but learns to predict what the text is trying to express. In this paper we will survey, discuss, and compare various techniques for sentiment analysis. Such techniques include older methods such as the Bag of Words model and more modern techniques such as neural net based word and paragraph vector analysis. These models would be used on a common random forest classification tree. These methods were implemented and tested on the Stanford IMDB movie review dataset. This dataset expresses the star review system as a binary value, where greater than seven is a ‘1’, and less than five is a ‘0’. Intermediate values were thrown out. <results>
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -497,36 +413,44 @@ In language, sentiment is a major component of overall expression. Sentiment ana
 
 \section{Introduction}
 
-When implementing machine intelligence techniques in practical applications, we often wish to predict the feeling of the author through text. Rather than predicting the subject of the text, sentiment analysis aims to determine how the text is speaking about a subject. Sentiment is crucial in language and communication, and therefore important to consider in text analysis. In this paper, we will be aiming to compare common machine learning models to determine which model succeeds in arbitrary length paragraph sentiment classification. 
-
-We’re currently living in a world saturated with textual reviews, discussions, and opinions. Sentiment is a crucial datapoint for being able to take these pieces of text and extract a useful understanding of the authors intention. 
-
-Sentiment analysis is distinct from subject analysis in the inference phase of training. For both types of analysis, vocabularies are built for the model to have an understanding of surrounding words. These methods split during training for classification and differ based on classification ground truth labels. 
+We’re currently living in a world saturated with textual reviews, discussions, and opinions. Sentiment is a crucial datapoint for being able to take these pieces of text and extract a useful understanding of the author's intention. While much of machine learning tends to lean towards predicting what the data represents, sentiment analysis gives an opportunity to understand emotion and opinion behind the data. 
+Sentiment analysis is distinct from subject analysis in the inference phase of training. For both types of analysis, vocabularies are built for the model to have an understanding of surrounding words. These methods split during training for classification, as subject analysis would train using subject ground truth labels and sentiment analysis would train using sentiment labels accordingly. Sentiment analysis is primarily performed on text input taken from sources such as reviews, forums, and comment sections. 
 For this paper, we will be using the Stanford IMDB dataset. This dataset consists of 100k individual reviews, with 50k labeled with either a positive or negative sentiment. This will allow for a large vocabulary to be available for training producing a diverse model to be used on unknown reviews. This dataset will be beneficial due to the medium to large sized paragraphs available, which will be allow for more robust models. In this paper, we will be implementing several models beneficial in sentiment analysis, including Bag of Words, Word vectors, and paragraph vectors. These models will be compared using identical classification trees in a random forest configuration.
 
 \section{Discussion on the dataset}
 In this section we will be discussing the IMDB dataset and its format. Discussion on the data split, the labeled, and unlabeled, train and test data obtained from a kaggle competition page. 
 
-Also discussed will be the processing of the data, such as removing any html tags, removing any unwanted punctuation,  and splitting the data on whitespace to create an array from which to learn on. Additionally, discussion on what punctuation should be kept and what should be ignored
-
-The Large Movie Review Dataset (ref here) released by Stanford University, was built with sentiment analysis in mind. This dataset consists of 100k movie reviews from the Internet Movie DataBase (IMDB). Half of the reviews in the dataset were labeled using Amazon’s Mechanical Turk. For each sample, if a review gave greater than or equal to seven stars, the review was given a positive label. Likewise, a review with less than or equal to four, it received a negative label. This binary classification labels allow for the task of classification to be easier later on, as it avoids vague moderate reviews and their effect on the learning.
+Also discussed will be the processing of the data, such as removing any html tags, removing any unwanted punctuation,  and splitting the data on whitespace to create an array from which to learn on. Additionally, discussion on what punctuation should be kept and what should be ignored.
+The Large Movie Review Dataset introduced by mass et al.~\cite{maas-EtAl:2011:ACL-HLT2011},was built with sentiment analysis in mind. This dataset consists of 100k movie reviews from the Internet Movie DataBase (IMDB). Half of the reviews in the dataset were labeled using Amazon’s Mechanical Turk. For each sample, if a review gave greater than or equal to seven stars, the review was given a positive label. Likewise, a review with less than or equal to four, it received a negative label. This binary classification labels allow for the task of classification to be easier later on, as it avoids vague moderate reviews and their effect on the learning.
 
 In raw form, the data was separated into 5 directories, each containing many text files of individual reviews. Test and train data were separated into separate directories, and within those, positive and negative reviews were separated as well. In order to make use of these reviews, each directory in the lowest level was concatenated into a single TSV file, with the filename as the ID, the sentiment, and the full review, each separated by tab characters. 
 
-Next, the data must be further processed and cleaned. For each review, punctuation, capital letters, and HTML tags were stripped and the clean reviews were written to a new TSV file with the same format. This process was done a second time, but this time removing stop-words from the reviews. Stop words are words which connect together sentences and often do not provide much meaning. These are removed to avoid noise in the models. 
+Next, the data must be further processed and cleaned. For each review, punctuation, capital letters, and HTML tags were stripped and the clean reviews were written to a new TSV file with the same format. This process was done a second time, but this time removing stop-words from the reviews. Stop words are words which connect together sentences and often do not provide much meaning. These are removed to avoid noise in the models.
 
 
 \section{Survey and comparison of methods}
 Here we will be an overview of methods to solve the problem of sentiment analysis as well as a comparison of their strengths and weakness. 
 
--bag of words \\
--svm? \\
--neural net \\
--deep learning \\
+%-bag of words \\
+%-svm? \\
+%-neural net \\
+%-deep learning \\
 
 \section{Method of Test}
 In this section, we will be discussing the methods that will be chosen for comparison.
 Also to be discussed is why each was chosen.
+
+When testing to compare these methods, it was important to ensure data was consistent. Certain implementations had taken influence from online tutorials such as \cite{kagglecompetition} but had datasets preprocessed from the source in varying ways. Each implementation needed to be modified to accept the processed format defined for this experiment.
+
+First, the Bag of Words (BoW) model was implemented. In order to construct a BoW model, a vectorizer object was defined using sklearn’s CountVectorizer library. The reviews of the corpus were concatenated into a list and fed into the CountVectorizer fit\_transform function to create the vector model that will be used for testing.
+
+Next, the word vector model better known as Word2Vec was implemented. Here, the training corpus was split into an array of sentences. This was then fed into the gensim library’s implementation of Word2Vec. For initial baseline tests, the parameters were given as follows; 300 features, minimum of 40 words in a sample, 4 workers, a context window of 10 words, and a frequent word downsampling of 1e-3 <MAKE NICE IN LATEX>. The model is unsupervised, and therefore could be trained on both labeled and unlabeled reviews. The model was generated and saved for later use.
+
+Finally, the paragraph vector model, Doc2Vec was implemented. Here, more work needed to be done as the gensim implementation requires very specific input. A named tuple list, which behaves in a similar manner to a dictionary, was created to hold lists of words from each review, as well as a tag for the Doc2Vec model to keep track of. This used the full training corpus, labeled and unlabeled in a similar manner to the Word2Vec implementation. Once again this model was saved for later use.
+
+In order to compare the models and not classification methods, the same random forest tree classifier was used. This implementation was taken from a tutorial for BoW and Word2Vec by Kaggle \cite{kagglecompetition}. The random forest classifier will fit a classification tree to the trained model and the corresponding training labels. The test data would then be vectorized and applied to the tree, where sentiment could be predicted. For all tests except one, the random forest used 100 estimator trees. Using this method, all three models could be used to classify in such a way that allows for comparison.
+
+
 
 \section{Results}
 
@@ -664,36 +588,41 @@ Also to be discussed is why each was chosen.
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
+%\begin{thebibliography}{1}
 
-\bibitem{Collab}
-Sentiment~Prediction~Using~Collaborative~Filtering,
-Jihie~Kim,~Jaebong~Yoo,~Ho~Lim,~Huida~Qiu,~Zornitsa~Kozareva,~Aram Galstyan
+%\bibitem{Collab}
+%Sentiment~Prediction~Using~Collaborative~Filtering,
+%Jihie~Kim,~Jaebong~Yoo,~Ho~Lim,~Huida~Qiu,~Zornitsa~Kozareva,~Aram Galstyan
+%
+%\bibitem{minCut}
+%A~Sentimental~Education:~Sentiment~Analysis~Using~Subjectivity:~Summarization~Based~on~Minimum~Cuts
+%Bo~Pang~and~Lillian~Lee
+%
+%\bibitem{thumbs}
+%Thumbs~up?~Sentiment~Classification~using~Machine~Learning~Techniques 
+%Bo~Pang~and~Lillian~Lee,~Shivakumar~Vaithyanathan
+%
+%\bibitem{imdbDataset}
+%Large Movie Review Dataset
+%Andrew~Maas, http://ai.stanford.edu/~amaas/data/sentiment/
+%@InProceedings{maas-EtAl:2011:ACL-HLT2011,
+%  author    = {Maas, Andrew L.  and  Daly, Raymond E.  and  Pham, Peter T.  and  Huang, Dan  and  Ng, Andrew Y.  and  Potts, Christopher},
+%  title     = {Learning Word Vectors for Sentiment Analysis},
+%  booktitle = {Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies},
+%  month     = {June},
+%  year      = {2011},
+%  address   = {Portland, Oregon, USA},
+%  publisher = {Association for Computational Linguistics},
+%  pages     = {142--150},
+%  url       = {http://www.aclweb.org/anthology/P11-1015}
+%}
 
-\bibitem{minCut}
-A~Sentimental~Education:~Sentiment~Analysis~Using~Subjectivity:~Summarization~Based~on~Minimum~Cuts
-Bo~Pang~and~Lillian~Lee
-
-\bibitem{thumbs}
-Thumbs~up?~Sentiment~Classification~using~Machine~Learning~Techniques 
-Bo~Pang~and~Lillian~Lee,~Shivakumar~Vaithyanathan
-
-@InProceedings{maas-EtAl:2011:ACL-HLT2011,
-  author    = {Maas, Andrew L.  and  Daly, Raymond E.  and  Pham, Peter T.  and  Huang, Dan  and  Ng, Andrew Y.  and  Potts, Christopher},
-  title     = {Learning Word Vectors for Sentiment Analysis},
-  booktitle = {Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies},
-  month     = {June},
-  year      = {2011},
-  address   = {Portland, Oregon, USA},
-  publisher = {Association for Computational Linguistics},
-  pages     = {142--150},
-  url       = {http://www.aclweb.org/anthology/P11-1015}
-}
-
- 
+\bibliographystyle{IEEEtran} 
+\raggedright
+\bibliography{report}{}
 
 
-\end{thebibliography}
+%\end{thebibliography}
 
 % biography section
 % 

@@ -115,7 +115,7 @@ def forest_test(model,stopwords, method):
         model = Doc2Vec.load("models/"+model)
     else:
         model = Word2Vec.load("models/"+model)
-    l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300)
+    l.randomForestvec(model,lptrs.append(lntrs),lpts.append(lnts), 300, method )
 
 def forest_test_bow(model,stopwords, vec):
     if stopwords:
@@ -135,11 +135,11 @@ def main():
         filePointers = process()
         clean(opd, True) #dont remove stopwords
         clean(opd, False) #remove em
-        trainW2V(True)
-        trainD2V(True)
-    forest_test("300features40words4workers10context", True, "w2v")
-    forest_test("300features40words4workers10context_pvec",True, "d2v")
-    model,vec = trainBOW(False)
-    forest_test_bow(model, False, vec)
+    trainW2V(False)
+    trainD2V(False)
+    forest_test("300features40words4workers20context", False, "w2v")
+    forest_test("300features40words4workers20context_pvec",False, "d2v")
+   # model,vec = trainBOW(False)
+   # forest_test_bow(model, False, vec)
 
 main()
