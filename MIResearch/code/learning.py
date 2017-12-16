@@ -56,14 +56,14 @@ class learning():
         num_workers = 4       # Number of threads to run in parallel
         context = 20          # Context window size
         downsampling = 1e-3   # Downsample setting for frequent words
-
+        skipgram = 1
         # Initialize and train the model (this will take some time)
         print( "Training Word2Vec model...")
         assert gensim.models.word2vec.FAST_VERSION > -1
 
         model = Word2Vec(sentences, workers=num_workers, \
                     size=num_features, min_count = min_word_count, \
-                    window = context, sample = downsampling, seed=1)
+                    window = context, sample = downsampling, seed=1,sg = skipgram)
 
         # If you don't plan to train the model any further, calling
         # init_sims will make the model much more memory-efficient.
@@ -72,7 +72,11 @@ class learning():
         # It can be helpful to create a meaningful model name and
         # save the model for later use. You can load it later using Word2Vec.load()
 
-        model_name = ("models/%dfeatures%dwords%dworkers%dcontext") % (num_features, min_word_count, num_workers, context)
+        if skipgram:
+            skpg = "_sg"
+        else:
+            skpg = ""
+        model_name = ("models/%dfeatures%dwords%dworkers%dcontext%s") % (num_features, min_word_count, num_workers, context, skpg)
         model.save(model_name)
         return model
 
@@ -110,20 +114,24 @@ class learning():
         num_workers = 4       # Number of threads to run in parallel
         context = 20          # Context window size
         downsampling = 1e-3   # Downsample setting for frequent words
+        skipgram = 1
 
         # Initialize and train the model (this will take some time)
         print("Training Doc2Vec model...")
         model = Doc2Vec(docs, workers=num_workers, \
                     size=num_features, min_count = min_word_count, \
-                    window = context, sample = downsampling, seed=1)
+                    window = context, sample = downsampling, seed=1, dm = skipgram)
         # If you don't plan to train the model any further, calling
         # init_sims will make the model much more memory-efficient.
         #model.build_vocab(docs)
         model.init_sims(replace=True)
-
+        if skipgram:
+            skpg = "_dm"
+        else:
+            skpg = "_dbow"
         # It can be helpful to create a meaningful model name and
         # save the model for later use. You can load it later using Word2Vec.load()
-        model_name = ("models/%dfeatures%dwords%dworkers%dcontext_pvec") % (num_features, min_word_count, num_workers, context)
+        model_name = ("models/%dfeatures%dwords%dworkers%dcontext_pvec%s") % (num_features, min_word_count, num_workers, context,skpg)
         model.save(model_name)
         return model
 

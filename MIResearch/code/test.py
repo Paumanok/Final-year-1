@@ -135,10 +135,10 @@ def main():
         filePointers = process()
         clean(opd, True) #dont remove stopwords
         clean(opd, False) #remove em
-    trainW2V(False)
-    trainD2V(False)
-    forest_test("300features40words4workers20context", False, "w2v")
-    forest_test("300features40words4workers20context_pvec",False, "d2v")
+    #trainW2V(False)
+    #trainD2V(False)
+    forest_test("300features40words4workers20context_sg", False, "w2v")
+    #forest_test("300features40words4workers20context_pvec_sg",False, "d2v")
    # model,vec = trainBOW(False)
    # forest_test_bow(model, False, vec)
 
