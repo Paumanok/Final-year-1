@@ -105,3 +105,10 @@ MIResearch/tensorflow/*
 MIResearch/data/*
 300features*
 code/300features*
+MIResearch/code/data/*
+MIResearch/code/models/*
+MIResearch/code/data_tmp
+MIResearch/data/*
+dbow.png
+distributedmem.png
+w2vcbowskg.png
